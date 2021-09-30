@@ -1,9 +1,19 @@
 <div id="sidebar-collapse" class="col-sm-3 col-lg-2 sidebar">
     <ul class="nav menu">
-        <li class="active"><a href="index.html"><span class="glyphicon glyphicon-dashboard"></span> Dashboard</a></li>
-        <li><a href="widgets.html"><span class="glyphicon glyphicon-user"></span> Data Master Anggota</a></li>
-        <li><a href="charts.html"><span class="glyphicon glyphicon-stats"></span> Data Master Buku</a></li>
-        <li><a href="tables.html"><span class="glyphicon glyphicon-list-alt"></span> Data Master Kategori</a></li>
+        <li class="<?php if ($active_menu == 'dashboard') { echo "active"; } else { echo ""; } ?>">
+            <a href="<?php echo base_url('admin/dashboard') ?>"><span class="glyphicon glyphicon-dashboard"></span> Dashboard</a>
+        </li>
+        <li class="<?php if ($active_menu == 'master_anggota' || $active_menu == 'tambah_anggota' || $active_menu == 'edit_anggota') 
+        { echo "active"; } else { echo ""; } ?>">
+            <a href="<?php echo base_url('admin/masterAnggota') ?>"><span class="glyphicon glyphicon-user"></span> Data Master Anggota</a>
+        </li>
+        <li>
+            <a href="charts.html"><span class="glyphicon glyphicon-stats"></span> Data Master Buku</a>
+        </li>
+        <li class="<?php if ($active_menu == 'master_kategori' || $active_menu == 'tambah_kategori' || $active_menu == 'edit_kategori') 
+        { echo "active"; } else { echo ""; } ?>">
+            <a href="<?php echo base_url('admin/masterKategori') ?>"><span class="glyphicon glyphicon-list-alt"></span> Data Master Kategori</a>
+        </li>
         <li><a href="forms.html"><span class="glyphicon glyphicon-user"></span> Data Master Pustakawan</a></li>
         <li class="parent ">
             <a href="#">

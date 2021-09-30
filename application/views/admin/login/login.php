@@ -54,14 +54,14 @@
 	<?php if ($this->session->flashdata('warning')) : ?>
 		<script type="text/javascript">
 			$(document).ready(function() {
-				swal("Warning!", "{!! session('warning') !!}", "warning");
+				swal("Warning!", "<?php echo $_SESSION['warning'] ?>", "warning");
 			});
 		</script>
 	<?php endif; ?>
 	<?php if ($this->session->flashdata('info')) : ?>
 		<script type="text/javascript">
 			$(document).ready(function() {
-				swal("Info!", "{!! session('info') !!}", "info");
+				swal("Info!", "<?php echo $_SESSION['info'] ?>", "info");
 			});
 		</script>
 	<?php endif; ?>

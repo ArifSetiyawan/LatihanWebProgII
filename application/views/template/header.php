@@ -4,11 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Perpustakaan</title>
+    <title>Perpustakaan - <?php echo $judul_web ?></title>
 
     <link href="<?php echo config_item('css'); ?>bootstrap.min.css" rel="stylesheet">
     <link href="<?php echo config_item('css'); ?>datepicker3.css" rel="stylesheet">
     <link href="<?php echo config_item('css'); ?>styles.css" rel="stylesheet">
+    <link href="<?php echo config_item('css'); ?>bootstrap-table.css" rel="stylesheet">
+
 
 </head>
 
