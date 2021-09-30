@@ -13,7 +13,7 @@
                     </div>
 
                     <a href="<?php echo base_url('admin/tambahKategori') ?>">
-                        <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Tambah anggota</button>
+                        <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Tambah kategori</button>
                     </a> <br />
 
                     <table data-toggle="table" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-search="true" data-select-item-name="toolbar1" data-pagination="true">
@@ -40,8 +40,8 @@
                                         <a href="<?php echo base_url() ?>admin/editKategori/<?php echo $enkrip ?>" title="edit">
                                             <button class="btn btn-success"><span class="glyphicon glyphicon-edit"></span></button>
                                         </a>
-                                        <a href="#" title="hapus" onclick="doDelete()">
-                                            <button class="btn btn-danger" value="<?php echo $enkrip ?>" id="btnDelete"><span class="glyphicon glyphicon-trash"></span></button>
+                                        <a href="#" title="hapus" onclick="doDelete('<?php echo $enkrip ?>')">
+                                            <button class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>
                                         </a>
                                     </td>
                                 </tr>
@@ -55,7 +55,7 @@
 </div>
 
 <script type="text/javascript">
-    function doDelete() {
+    function doDelete(idKategori) {
         swal({
                 title: "Delete Data Kategori Buku?",
                 text: "Data ini akan terhapus permanent",
@@ -65,7 +65,7 @@
             })
             .then(ok => {
                 if (ok) {
-                    window.location.href = '<?php echo base_url() ?>admin/hapusKategori/' + document.getElementById("btnDelete").value;
+                    window.location.href = '<?php echo base_url() ?>admin/hapusKategori/' + idKategori;
                 } else {
                     $(this).removeAttr('disabled')
                 }

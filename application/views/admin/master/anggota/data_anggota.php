@@ -61,8 +61,8 @@
                                         <a href="<?php echo base_url() ?>admin/editAnggota/<?php echo $enkrip ?>" title="edit">
                                             <button class="btn btn-success"><span class="glyphicon glyphicon-edit"></span></button>
                                         </a>
-                                        <a href="#" title="hapus" onclick="doDelete()">
-                                            <button class="btn btn-danger" value="<?php echo $enkrip ?>" id="btnDelete"><span class="glyphicon glyphicon-trash"></span></button>
+                                        <a href="#" title="hapus" onclick="doDelete('<?php echo $enkrip ?>')">
+                                            <button class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>
                                         </a>
                                     </td>
                                 </tr>
@@ -76,7 +76,7 @@
 </div>
 
 <script type="text/javascript">
-    function doDelete() {
+    function doDelete(id_anggota) {
         swal({
                 title: "Delete Data Anggota?",
                 text: "Data ini akan terhapus permanent",
@@ -86,7 +86,7 @@
             })
             .then(ok => {
                 if (ok) {
-                    window.location.href = '<?php echo base_url() ?>admin/hapusAnggota/' + document.getElementById("btnDelete").value;
+                    window.location.href = '<?php echo base_url() ?>admin/hapusAnggota/' + id_anggota;
                 } else {
                     $(this).removeAttr('disabled')
                 }
