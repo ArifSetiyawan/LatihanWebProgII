@@ -34,7 +34,9 @@ class Admin extends CI_Controller
             $data = [
                 'idpustakawan' => $cek_user['id_pustakawan'],
                 'enid' => sha1($cek_user['id_pustakawan']),
-                'username' => $cek_user['nama_pustakawan']
+                'username' => $cek_user['nama_pustakawan'],
+                'akses' => $cek_user['akses_pustakawan']
+
             ];
             $this->session->set_userdata($data);
             redirect('admin/dashboard');
@@ -43,27 +45,59 @@ class Admin extends CI_Controller
 
     public function dashboard()
     {
-        $user_access = $this->session->userdata();
-
-        if ($user_access != null) {
-            if ($user_access['username'] == null) {
-                $this->session->set_flashdata('warning', "Silahkan login dulu !");
-                redirect('admin');
-            }
-        } else {
-            $this->session->set_flashdata('warning', "Silahkan login dulu !");
-            redirect('admin');
-        }
         $data['judul_web'] = "Dashboard";
         $data['active_menu'] = "dashboard";
+
         $this->load->view('template/header', $data);
         $this->load->view('template/sidebar');
         $this->load->view('admin/login/dashboard');
         $this->load->view('template/footer');
     }
+    public function gantiPassword()
+    {
+        $data['judul_web'] = "Ganti Password";
+        $data['active_menu'] = "ganti_password";
 
+        $this->load->view('template/header', $data);
+        $this->load->view('template/sidebar');
+        $this->load->view('admin/login/ganti_password');
+        $this->load->view('template/footer');
+    }
+
+    public function updatePassword()
+    {
+        $id_pustakawan = $_SESSION['idpustakawan'];
+        $hasil = $this->ModelAdmin->getPassword(['id_pustakawan' => $id_pustakawan])->row_array();
+        $pass_lama = sha1($this->input->post('p_lama', true));
+
+        $data = [
+            $pass_lama,
+            $hasil
+        ];
+
+        print_r($data);
+        die;
+        $pass_baru = $this->input->post('p_baru', true);
+        $konfirm_baru = $this->input->post('konfirm_baru', true);
+        $where = ['id_pustakawan' => $id_pustakawan];
+
+        if ($pass_lama == $hasil['passw_pustakawan']) {
+            if ($konfirm_baru == $pass_baru) {
+                $this->ModelAdmin->updatePassword(sha1($konfirm_baru), $where);
+                $this->session->set_flashdata('success', "Data Password Berhasil Disimpan");
+                redirect('admin/gantiPassword');
+            } else {
+                $this->session->set_flashdata('warning', "Konfirmasi Password baru tidak match");
+                redirect('admin/gantiPassword');
+            }
+        } else {
+            $this->session->set_flashdata('warning', "Data Password Lama tidak valid");
+            redirect('admin/gantiPassword');
+        }
+    }
     public function masterAnggota()
     {
+
         $data['judul_web'] = "Master Data Anggota";
         $data['active_menu'] = "master_anggota";
         $data['data_anggota'] = $this->ModelAnggota->getAll()->result_array();
@@ -273,6 +307,223 @@ class Admin extends CI_Controller
         $this->session->unset_userdata('idKategori');
         $this->session->set_flashdata('success', "Data Kategori Berhasil Diedit");
         redirect('admin/masterKategori');
+    }
+
+    public function masterBuku()
+    {
+        $data['judul_web'] = "Master Data Buku";
+        $data['active_menu'] = "master_buku";
+        $data['data_buku'] = $this->ModelBuku->getJoinAll()->result_array();
+
+        $this->load->view('template/header', $data);
+        $this->load->view('template/sidebar');
+        $this->load->view('admin/master/buku/data_buku');
+        $this->load->view('template/footer');
+    }
+
+    public function tambahBuku()
+    {
+        $data['judul_web'] = "Tambah Data Buku";
+        $data['active_menu'] = "tambah_buku";
+        $data['aktif_kategori'] = $this->ModelKategori->getWhere(['status_kategori_buku' => 'Aktif'])->result_array();
+
+
+        $this->load->view('template/header', $data);
+        $this->load->view('template/sidebar');
+        $this->load->view('admin/master/buku/tambah_buku');
+        $this->load->view('template/footer');
+    }
+
+    public function simpanBuku()
+    {
+        $kd_kategori = $this->input->post('k_buku', true);
+        $hasil = $this->ModelBuku->autoNumber(['id_kategori_buku' => $kd_kategori])->row_array();
+
+        $kode = $hasil['kode_buku'];
+        $noUrut = (int) substr($kode, 11, 5);
+        $noUrut++;
+
+        $id = $kd_kategori . '-' . date('ym') . '-' . sprintf('%05s', $noUrut);
+
+        $data = [
+            'kode_buku' => $id,
+            'judul_buku' => $this->input->post('judul', true),
+            'penulis_buku' => $this->input->post('penulis', true),
+            'penerbit_buku' => $this->input->post('penerbit', true),
+            'tahun_terbit' => $this->input->post('tahun_terbit', true),
+            'stok_buku' => $this->input->post('stok', true),
+            'id_kategori_buku' => $kd_kategori,
+
+        ];
+
+        $simpan = $this->ModelBuku->simpanBuku($data);
+        $this->session->set_flashdata('success', "Data Buku Berhasil Disimpan");
+        redirect('admin/masterBuku');
+    }
+
+    public function hapusBuku()
+    {
+        $where = ['sha1(kode_buku)' => $this->uri->segment(3)];
+        $this->ModelBuku->hapusBuku($where);
+        $this->session->set_flashdata('success', "Data Buku Berhasil Dihapus");
+        redirect('admin/masterBuku');
+    }
+
+    public function editBuku()
+    {
+        $data['judul_web'] = "Edit Data Buku";
+        $data['active_menu'] = "edit_buku";
+        $data['aktif_kategori'] = $this->ModelKategori->getWhere(['status_kategori_buku' => 'Aktif'])->result_array();
+
+        $where = ['sha1(kode_buku)' => $this->uri->segment(3)];
+        $hasil = $this->ModelBuku->getWhere($where)->row_array();
+
+        $idBuku = [
+            'idBuku' => $hasil['kode_buku']
+        ];
+
+        $this->session->set_userdata($idBuku);
+
+        $dataEdit = [
+            'judul_buku' => $hasil['judul_buku'],
+            'penulis_buku' => $hasil['penulis_buku'],
+            'penerbit_buku' => $hasil['penerbit_buku'],
+            'tahun_terbit' => $hasil['tahun_terbit'],
+            'stok_buku' => $hasil['stok_buku'],
+            'kategori_buku' => $hasil['id_kategori_buku'],
+        ];
+
+
+        $this->load->view('template/header', $data);
+        $this->load->view('template/sidebar', $data);
+        $this->load->view('admin/master/buku/edit_buku', $dataEdit);
+        $this->load->view('template/footer');
+    }
+
+    public function updateBuku()
+    {
+        $id = $this->session->userdata('idBuku');
+
+        $where = ['kode_buku' => $id];
+
+        $data = [
+            'kode_buku' => $id,
+            'judul_buku' => $this->input->post('judul', true),
+            'penulis_buku' => $this->input->post('penulis', true),
+            'penerbit_buku' => $this->input->post('penerbit', true),
+            'tahun_terbit' => $this->input->post('tahun_terbit', true),
+            'stok_buku' => $this->input->post('stok', true),
+            'id_kategori_buku' => $this->input->post('k_buku', true),
+
+        ];
+
+        $simpan = $this->ModelBuku->updateBuku($data, $where);
+
+        $this->session->unset_userdata('idBuku');
+        $this->session->set_flashdata('success', "Data Buku Berhasil Diedit");
+        redirect('admin/masterBuku');
+    }
+
+
+    public function masterPustakawan()
+    {
+        $data['judul_web'] = "Master Data Pustakawan";
+        $data['active_menu'] = "master_pustakawan";
+        $data['data_pustakawan'] = $this->ModelPustakawan->getAll()->result_array();
+
+        $this->load->view('template/header', $data);
+        $this->load->view('template/sidebar');
+        $this->load->view('admin/master/pustakawan/data_pustakawan');
+        $this->load->view('template/footer');
+    }
+
+    public function tambahPustakawan()
+    {
+        $data['judul_web'] = "Tambah Data Pustakawan";
+        $data['active_menu'] = "tambah_pustakawan";
+
+        $this->load->view('template/header', $data);
+        $this->load->view('template/sidebar');
+        $this->load->view('admin/master/pustakawan/tambah_pustakawan');
+        $this->load->view('template/footer');
+    }
+
+    public function simpanPustakawan()
+    {
+        $hasil = $this->ModelPustakawan->autoNumber()->row_array();
+
+        $kode = $hasil['id_pustakawan'];
+
+        $noUrut = (int) substr($kode, 4, 3);
+        $noUrut++;
+        $id = 'PKN' . sprintf('%03s', $noUrut);
+
+        $data = [
+            'id_pustakawan' => $id,
+            'nama_pustakawan' => $this->input->post('nama_pustakawan', true),
+            'username_pustakawan' => $this->input->post('username', true),
+            'passw_pustakawan' => sha1('pustakawan'),
+            'akses_pustakawan' => 2
+
+        ];
+
+        $simpan = $this->ModelPustakawan->simpanPustakawan($data);
+        $this->session->set_flashdata('success', "Data Pustakawan Berhasil Disimpan");
+        redirect('admin/masterPustakawan');
+    }
+
+    public function hapusPustakawan()
+    {
+        $where = ['sha1(id_pustakawan)' => $this->uri->segment(3)];
+        $this->ModelPustakawan->hapusPustakawan($where);
+        $this->session->set_flashdata('success', "Data Pustakawan Berhasil Dihapus");
+        redirect('admin/masterPustakawan');
+    }
+
+    public function editPustakawan()
+    {
+        $data['judul_web'] = "Edit Data Pustakawan";
+        $data['active_menu'] = "edit_pustakawan";
+
+        $where = ['sha1(id_pustakawan)' => $this->uri->segment(3)];
+        $hasil = $this->ModelPustakawan->getWhere($where)->row_array();
+
+        $idPustakawan = [
+            'idPustakawan' => $hasil['id_pustakawan']
+        ];
+
+        $this->session->set_userdata($idPustakawan);
+
+        $dataEdit = [
+            'nama_pustakawan' => $hasil['nama_pustakawan'],
+            'username_pustakawan' => $hasil['username_pustakawan'],
+        ];
+
+
+        $this->load->view('template/header', $data);
+        $this->load->view('template/sidebar', $data);
+        $this->load->view('admin/master/pustakawan/edit_pustakawan', $dataEdit);
+        $this->load->view('template/footer');
+    }
+
+    public function updatePustakawan()
+    {
+        $id = $this->session->userdata('idPustakawan');
+
+        $where = ['id_pustakawan' => $id];
+
+        $data = [
+            'id_pustakawan' => $id,
+            'nama_pustakawan' => $this->input->post('nama_pustakawan', true),
+            'username_pustakawan' => $this->input->post('username', true)
+
+        ];
+
+        $simpan = $this->ModelPustakawan->updatePustakawan($data, $where);
+
+        $this->session->unset_userdata('idPustakawan');
+        $this->session->set_flashdata('success', "Data Pustakawan Berhasil Diedit");
+        redirect('admin/masterPustakawan');
     }
 
     public function logout()

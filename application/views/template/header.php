@@ -1,3 +1,17 @@
+<?php
+$user_access = $this->session->userdata();
+
+if ($user_access != null) {
+    if ($user_access['username'] == null) {
+        $this->session->set_flashdata('warning', "Silahkan login dulu !");
+        redirect('admin');
+    }
+} else {
+    $this->session->set_flashdata('warning', "Silahkan login dulu !");
+    redirect('admin');
+}
+?>
+
 <!DOCTYPE html>
 <html>
 

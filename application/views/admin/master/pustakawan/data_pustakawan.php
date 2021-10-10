@@ -7,62 +7,54 @@
                     <div class="row">
                         <ol class="breadcrumb">
                             <li><a href="#"><span class="glyphicon glyphicon-user"></span></a></li>
-                            <li class="active">Master Data Anggota</li>
+                            <li class="active">Master Data Pustakawan</li>
                         </ol>
                         <br />
                     </div>
 
-                    <a href="<?php echo base_url('admin/tambahAnggota') ?>">
-                        <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Tambah anggota</button>
+                    <a href="<?php echo base_url('admin/tambahPustakawan') ?>">
+                        <button type="button" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Tambah Pustakawan</button>
                     </a> <br />
 
                     <table data-toggle="table" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-search="true" data-select-item-name="toolbar1" data-pagination="true">
                         <thead>
                             <tr>
                                 <th data-sortable="true">#</th>
-                                <th data-sortable="true">No. Anggota</th>
-                                <th data-sortable="true">No. Identitas</th>
-                                <th data-sortable="true">Nama Anggota</th>
-                                <th data-sortable="true">Tempat Lahir</th>
-                                <th data-sortable="true">Tanggal Lahir</th>
-                                <th data-sortable="true">Jenis Kelamin</th>
-                                <th data-sortable="true">Status Anggota</th>
+                                <th data-sortable="true">Nama Pustakawan</th>
+                                <th data-sortable="true">Username</th>
+                                <th data-sortable="true">Akses Pustakawan</th>
                                 <th data-sortable="true">Opsi</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php
                             $no = 0;
-                            foreach ($data_anggota as $anggota) {
-                                $enkrip = sha1($anggota['no_anggota']);
+                            foreach ($data_pustakawan as $pustakawan) {
+                                $enkrip = sha1($pustakawan['id_pustakawan']);
                             ?>
 
                                 <tr>
                                     <td data-sortable="true"><?php echo $no = $no + 1 ?></td>
-                                    <td data-sortable="true"><?php echo $anggota['no_anggota'] ?></td>
-                                    <td data-sortable="true"><?php echo $anggota['no_identitas'] ?></td>
-                                    <td data-sortable="true"><?php echo $anggota['nama_anggota'] ?></td>
-                                    <td data-sortable="true"><?php echo $anggota['tempat_lahir'] ?></td>
-                                    <td data-sortable="true"><?php echo $anggota['tanggal_lahir'] ?></td>
+                                    <td data-sortable="true"><?php echo $pustakawan['nama_pustakawan'] ?></td>
+                                    <td data-sortable="true"><?php echo $pustakawan['username_pustakawan'] ?></td>
                                     <td data-sortable="true">
                                         <?php
-                                        if ($anggota['jenis_kelamin'] == "L") {
-                                            echo "Laki Laki";
-                                        } elseif ($anggota['jenis_kelamin'] == "P") {
-                                            echo "Perempuan";
+                                        if ($pustakawan['akses_pustakawan'] == 1) {
+                                            echo "Superadmin";
+                                        } elseif ($pustakawan['akses_pustakawan'] == 2) {
+                                            echo "User";
                                         } else {
                                             echo "";
                                         }
 
                                         ?>
                                     </td>
-                                    <td data-sortable="true"><?php echo $anggota['status_anggota'] ?></td>
                                     <td data-sortable="true">
-                                        <a href="<?php echo base_url() ?>admin/editAnggota/<?php echo $enkrip ?>" title="edit">
+                                        <a href="<?php echo base_url() ?>admin/editPustakawan/<?php echo $enkrip ?>" title="edit">
                                             <button class="btn btn-success"><span class="glyphicon glyphicon-edit"></span></button>
                                         </a>
-                                        <a href="#" title="hapus" onclick="doDelete()">
-                                            <button class="btn btn-danger" value="<?php echo $enkrip ?>" id="btnDelete"><span class="glyphicon glyphicon-trash"></span></button>
+                                        <a href="#" title="hapus" onclick="doDelete('<?php echo $enkrip ?>')">
+                                            <button class="btn btn-danger"><span class="glyphicon glyphicon-trash"></span></button>
                                         </a>
                                     </td>
                                 </tr>
@@ -76,9 +68,9 @@
 </div>
 
 <script type="text/javascript">
-    function doDelete() {
+    function doDelete(id_pustakawan) {
         swal({
-                title: "Delete Data Anggota?",
+                title: "Delete Data Pustakawan?",
                 text: "Data ini akan terhapus permanent",
                 icon: "warning",
                 buttons: true,
@@ -86,7 +78,7 @@
             })
             .then(ok => {
                 if (ok) {
-                    window.location.href = '<?php echo base_url() ?>admin/hapusAnggota/' + document.getElementById("btnDelete").value;
+                    window.location.href = '<?php echo base_url() ?>admin/hapusPustakawan/' + id_pustakawan;
                 } else {
                     $(this).removeAttr('disabled')
                 }
