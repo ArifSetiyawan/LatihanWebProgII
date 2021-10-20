@@ -26,8 +26,8 @@
                 <span class="glyphicon glyphicon-list"></span> Transaksi <span data-toggle="collapse" href="#sub-item-1" class="icon pull-right"><em class="glyphicon glyphicon-s glyphicon-plus"></em></span>
             </a>
             <ul class="children collapse" id="sub-item-1">
-                <li>
-                    <a class="" href="#">
+                <li <?php if ($active_menu == 'pinjam_buku') { echo "active"; } else { echo ""; } ?>>
+                    <a class="" href="<?php echo base_url('transaksi/pinjam_buku') ?>">
                         <span class="glyphicon glyphicon-share-alt"></span> Peminjaman Buku
                     </a>
                 </li>
